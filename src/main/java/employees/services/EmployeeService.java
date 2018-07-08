@@ -25,10 +25,9 @@ public interface EmployeeService {
 	 *            - list of employee records
 	 * 
 	 * @return - map of key value pairs, where the key represents a given
-	 *         employee pair and the value represents its corresponding project
-	 *         time.
+	 *         employee pair and the value represents its corresponding common projects.
 	 */
-	public abstract Map<EmployeePair, ProjectTime> findEmployeePairs(final List<EmployeeRecord> empRecords);
+	public abstract Map<EmployeePair, List<ProjectTime>> findEmployeePairs(final List<EmployeeRecord> empRecords);
 
 	/**
 	 * Method that finds the employee pair worked longest on common projects and

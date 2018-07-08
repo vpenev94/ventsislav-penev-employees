@@ -11,46 +11,32 @@ import java.util.List;
  */
 public final class EmployeePairDetails {
 
-	private long firstEmployeeId;
-	private long secondEmployeeId;
+	private EmployeePair empPair;
 	private List<ProjectTime> commonProjects;
 
 	/**
 	 * Constructor that creates an instance of <b>EmployeePairDetails</b>
 	 * 
-	 * @param firstEmployeeId
-	 *            - id of the first employee
-	 * @param secondEmployeeId
-	 *            - id of the second employee
+	 * @param employeePair
+	 *            - represents the employee pair
+	 * 
 	 * @param commonProjects
 	 *            - list containing the details about the common projects
 	 */
-	public EmployeePairDetails(final long firstEmployeeId, final long secondEmployeeId,
-			final List<ProjectTime> commonProjects) {
+	public EmployeePairDetails(final EmployeePair empPair, final List<ProjectTime> commonProjects) {
 
-		this.firstEmployeeId = firstEmployeeId;
-		this.secondEmployeeId = secondEmployeeId;
+		this.empPair = empPair;
 		this.commonProjects = commonProjects;
 	}
 
 	/**
-	 * Method that returns the id of the first employee
+	 * Method that returns the employee pair.
 	 * 
-	 * @return - id of the first employee
+	 * @return - the employee pair
 	 */
-	public long getFirstEmployee() {
+	public EmployeePair getEmployeePair() {
 
-		return this.firstEmployeeId;
-	}
-
-	/**
-	 * Method that returns the id of the second employee
-	 * 
-	 * @return - id of the second employee
-	 */
-	public long getSecondEmployee() {
-
-		return this.secondEmployeeId;
+		return this.empPair;
 	}
 
 	/**

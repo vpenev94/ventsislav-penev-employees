@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import employees.commons.EmployeePair;
 import employees.commons.EmployeePairDetails;
 import employees.commons.EmployeeRecord;
 
@@ -32,14 +33,14 @@ public class EmployeeServiceIntegrationTest extends AbstractIntegrationSpringTes
 
 		// given
 		final String inputFile = getClass().getClassLoader().getResource("employees-integration.txt").getFile(); //$NON-NLS-1$
-
+		
+		final EmployeePair expectedLongestEmpPair = new EmployeePair(142, 143);
 		// when
 		final List<EmployeeRecord> empRecords = this.fileService.readEmployeeRecords(inputFile);
-		final EmployeePairDetails longestEmpPair = this.empService.findEmployeePairWorkedLongest(empRecords);
+		final EmployeePairDetails longestEmpPairDetails = this.empService.findEmployeePairWorkedLongest(empRecords);
 
 		// then
-		assertEquals(3, longestEmpPair.getFirstEmployee());
-		assertEquals(4, longestEmpPair.getSecondEmployee());
-		assertEquals(2, longestEmpPair.getCommonProjects().size());
+		assertEquals(expectedLongestEmpPair, longestEmpPairDetails.getEmployeePair());
+		assertEquals(3, longestEmpPairDetails.getCommonProjects().size());
 	}
 }

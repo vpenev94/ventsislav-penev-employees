@@ -87,10 +87,12 @@ class UIMediator {
 		for (ProjectTime projTime : empPairDetails.getCommonProjects()) {
 
 			@SuppressWarnings("boxing")
-			final Object[] empTableRowData = new Object[] { empPairDetails.getFirstEmployee(),
-					empPairDetails.getSecondEmployee(), projTime.getProjectId(), projTime.getStartDate(),
-					projTime.getEndDate(),
-					DateUtils.calculateDaysBetweenDates(projTime.getStartDate(), projTime.getEndDate()) };
+			final Object[] empTableRowData = new Object[] { empPairDetails.getEmployeePair().getFirstEmployeeId(),
+															empPairDetails.getEmployeePair().getSecondEmployeeId(),
+															projTime.getProjectId(),
+															projTime.getStartDate(),
+															projTime.getEndDate(),
+															DateUtils.calculateDaysBetweenDates(projTime.getStartDate(), projTime.getEndDate()) };
 
 			final DefaultTableModel empTableModel = ((DefaultTableModel) this.employeeTable.getModel());
 			empTableModel.addRow(empTableRowData);

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -20,40 +19,30 @@ import employees.commons.ProjectTime;
 public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
-	public EmployeePairDetails findEmployeePairWorkedLongest(List<EmployeeRecord> empRecords) {
+	public EmployeePairDetails findEmployeePairWorkedLongest(final List<EmployeeRecord> empRecords) {
 
-		final HashMap<EmployeePair, List<ProjectTime>> pairProjecTimes = new HashMap<>();
 
-		final Map<Long, List<EmployeeRecord>> employeesPerProject = empRecords.stream()
-																				.collect(Collectors.groupingBy(EmployeeRecord::getProjectId, Collectors.toList()));
+		final Map<EmployeePair, List<ProjectTime>> empPairsProjecs = findEmployeePairs(empRecords );
 
-		
-		for (Map.Entry<Long, List<EmployeeRecord>> project : employeesPerProject.entrySet()) {
-			
-			final Map<EmployeePair, ProjectTime> empPairsPerProject = findEmployeePairs(project.getValue());
 
-			empPairsPerProject.entrySet().stream()
-			                             .forEach(entry -> addProjTimeForEmpPair(pairProjecTimes, entry));
-		}
-
-		
-		Map.Entry<EmployeePair, List<ProjectTime>> bestPair = pairProjecTimes.entrySet().stream()
+		final Map.Entry<EmployeePair, List<ProjectTime>> bestPair = empPairsProjecs.entrySet().stream()
 																						.sorted(this::compare)
 																						.findFirst()
 																						.orElse(null);
-		
-		if(bestPair != null){
-			
-			return new EmployeePairDetails(bestPair.getKey().getFirstEmployeeId(), bestPair.getKey().getSecondEmployeeId(), bestPair.getValue());
+
+
+		if (bestPair != null) {
+
+			return new EmployeePairDetails(bestPair.getKey(), bestPair.getValue());
 		}
-		
+
 		return null;
 	}
 
 	@Override
-	public final Map<EmployeePair, ProjectTime> findEmployeePairs(final List<EmployeeRecord> empRecords) {
+	public final Map<EmployeePair, List<ProjectTime>> findEmployeePairs(final List<EmployeeRecord> empRecords) {
 
-		final HashMap<EmployeePair, ProjectTime> pairProjectTimes = new HashMap<>();
+		final Map<EmployeePair, List<ProjectTime>> pairProjectTimes = new HashMap<>();
 
 		for (int i = 0; i < empRecords.size() - 1; i++) {
 
@@ -63,6 +52,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 				final EmployeeRecord secondRecord = empRecords.get(j);
 
+				if (firstRecord.getEmployeeId() == secondRecord.getEmployeeId()
+						|| firstRecord.getProjectId() != secondRecord.getProjectId()) {
+				
+					continue;
+				}
+				
 				final Period overlappedPeriod = DateUtils.getPeriodOverlap(
 						new Period(firstRecord.getStrartDate(), firstRecord.getEndDate()),
 						new Period(secondRecord.getStrartDate(), secondRecord.getEndDate()));
@@ -74,45 +69,52 @@ public class EmployeeServiceImpl implements EmployeeService {
 					final EmployeePair empPair = new EmployeePair(firstRecord.getEmployeeId(),
 							secondRecord.getEmployeeId());
 
-					pairProjectTimes.put(empPair, projTime);
+					addProjTimeForEmpPair(pairProjectTimes, empPair, projTime);
 				}
 			}
 		}
 		return pairProjectTimes;
 	}
 
+
 	@SuppressWarnings("static-method")
-	private void addProjTimeForEmpPair(final HashMap<EmployeePair, List<ProjectTime>> pairProjectTimes,
-			final Map.Entry<EmployeePair, ProjectTime> pairProjTime) {
+	private void addProjTimeForEmpPair(final Map<EmployeePair, List<ProjectTime>> pairProjectTimes,
+			final EmployeePair empPair, final ProjectTime projTime) {
 
-		if (pairProjectTimes.containsKey(pairProjTime.getKey())) {
+		if (pairProjectTimes.containsKey(empPair)) {
 
-			pairProjectTimes.get(pairProjTime.getKey()).add(pairProjTime.getValue());
+			pairProjectTimes.get(empPair).add(projTime);
 		}
 
 		else {
 			final List<ProjectTime> projTimes = new ArrayList<>();
-			projTimes.add(pairProjTime.getValue());
-			pairProjectTimes.put(pairProjTime.getKey(), projTimes);
+			projTimes.add(projTime);
+			pairProjectTimes.put(empPair, projTimes);
 		}
 	}
 
+
+	
 	private int compare(Map.Entry<EmployeePair, List<ProjectTime>> pair1,
 			Map.Entry<EmployeePair, List<ProjectTime>> pair2) {
-		
+
 		final long firstPairWorkedDays = calculateTotalDaysWorked(pair1.getValue());
 		final long secondPairWorkedDays = calculateTotalDaysWorked(pair2.getValue());
-		
+
 		return firstPairWorkedDays > secondPairWorkedDays ? -1 : firstPairWorkedDays < secondPairWorkedDays ? 1 : 0;
 	}
+
+
 	
-	private long calculateTotalDaysWorked(final List<ProjectTime> projTimes){
+	private long calculateTotalDaysWorked(final List<ProjectTime> projTimes) {
 
 		return projTimes.stream().mapToLong(this::calculateWorkedDays).sum();
 	}
-	
-	private long calculateWorkedDays(final ProjectTime projTime){
-		
+
+
+
+	private long calculateWorkedDays(final ProjectTime projTime) {
+
 		return Duration.between(projTime.getStartDate().atStartOfDay(), projTime.getEndDate().atStartOfDay()).toDays();
 	}
 }

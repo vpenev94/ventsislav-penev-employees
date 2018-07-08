@@ -42,7 +42,7 @@ public class EmployeeServiceUnitTest {
 
 	@SuppressWarnings({ "nls", "static-method" })
 	@Test
-	public void itShoudFindEmpPairsPerProject() throws IOException {
+	public void itShoudFindAllEmpPairs() throws IOException {
 
 		// given
 		final List<EmployeeRecord> empRecords = new ArrayList<>();
@@ -59,12 +59,66 @@ public class EmployeeServiceUnitTest {
 		when(fileService.readEmployeeRecords(any(String.class))).thenReturn(empRecords);
 		final List<EmployeeRecord> inputRecords = fileService.readEmployeeRecords("");
 
-		final Map<EmployeePair, ProjectTime> empPairs = empService.findEmployeePairs(inputRecords);
+		final Map<EmployeePair, List<ProjectTime>> empPairs = empService.findEmployeePairs(inputRecords);
 
 		// then
 		assertEquals(2, empPairs.size());
 		assertTrue(empPairs.containsKey(expectedPair1));
 		assertTrue(empPairs.containsKey(expectedPair2));
+
+	}
+
+	@SuppressWarnings({ "nls", "static-method" })
+	@Test
+	public void itShoudCorrectlyFindEmpPairWithReversedIds() throws IOException {
+
+		// given
+		final List<EmployeeRecord> empRecords = new ArrayList<>();
+
+		empRecords.add(new EmployeeRecord(3, 0, LocalDate.parse("2018-06-15"), LocalDate.parse("2018-06-20")));
+		empRecords.add(new EmployeeRecord(4, 0, LocalDate.parse("2018-06-16"), LocalDate.parse("2018-06-20")));
+		empRecords.add(new EmployeeRecord(4, 1, LocalDate.parse("2018-06-25"), LocalDate.parse("2018-06-30")));
+		empRecords.add(new EmployeeRecord(3, 1, LocalDate.parse("2018-06-27"), LocalDate.parse("2018-06-30")));
+
+		final EmployeePair expectedPair = new EmployeePair(3, 4);
+
+		// when
+		when(fileService.readEmployeeRecords(any(String.class))).thenReturn(empRecords);
+		final List<EmployeeRecord> inputRecords = fileService.readEmployeeRecords("");
+
+		final Map<EmployeePair, List<ProjectTime>> empPairs = empService.findEmployeePairs(inputRecords);
+
+		// then
+		assertEquals(1, empPairs.size());
+		assertTrue(empPairs.containsKey(expectedPair));
+		assertEquals(2, empPairs.get(expectedPair).size());
+
+	}
+
+	@SuppressWarnings({ "nls", "static-method" })
+	@Test
+	public void itShoudCorrectlyFindPairWorkedOnProjectMoreThanOnce() throws IOException {
+
+		// given
+		final List<EmployeeRecord> empRecords = new ArrayList<>();
+
+		empRecords.add(new EmployeeRecord(3, 0, LocalDate.parse("2017-06-15"), LocalDate.parse("2017-06-20")));
+		empRecords.add(new EmployeeRecord(4, 0, LocalDate.parse("2017-06-16"), LocalDate.parse("2017-06-20")));
+		empRecords.add(new EmployeeRecord(4, 0, LocalDate.parse("2018-06-25"), LocalDate.parse("2018-06-30")));
+		empRecords.add(new EmployeeRecord(3, 0, LocalDate.parse("2018-06-27"), LocalDate.parse("2018-06-30")));
+
+		final EmployeePair expectedPair = new EmployeePair(3, 4);
+
+		// when
+		when(fileService.readEmployeeRecords(any(String.class))).thenReturn(empRecords);
+		final List<EmployeeRecord> inputRecords = fileService.readEmployeeRecords("");
+
+		final Map<EmployeePair, List<ProjectTime>> empPairs = empService.findEmployeePairs(inputRecords);
+
+		// then
+		assertEquals(1, empPairs.size());
+		assertTrue(empPairs.containsKey(expectedPair));
+		assertEquals(2, empPairs.get(expectedPair).size());
 
 	}
 
@@ -81,16 +135,17 @@ public class EmployeeServiceUnitTest {
 		empRecords.add(new EmployeeRecord(2, 2, LocalDate.parse("2018-06-20"), LocalDate.parse("2018-06-25")));
 		empRecords.add(new EmployeeRecord(3, 3, LocalDate.parse("2018-06-28"), LocalDate.parse("2018-06-30")));
 		empRecords.add(new EmployeeRecord(4, 3, LocalDate.parse("2018-06-27"), LocalDate.parse("2018-06-30")));
+		
+		final EmployeePair expectedLongestEmpPair = new EmployeePair(3, 4);
 
 		// when
 		when(fileService.readEmployeeRecords(any(String.class))).thenReturn(empRecords);
 		final List<EmployeeRecord> inputRecords = fileService.readEmployeeRecords("");
 
-		final EmployeePairDetails longestEmpPair = empService.findEmployeePairWorkedLongest(inputRecords);
+		final EmployeePairDetails longestEmpPairDetails = empService.findEmployeePairWorkedLongest(inputRecords);
 
 		// then
-		assertEquals(3, longestEmpPair.getFirstEmployee());
-		assertEquals(4, longestEmpPair.getSecondEmployee());
-		assertEquals(2, longestEmpPair.getCommonProjects().size());
+		assertEquals(expectedLongestEmpPair, longestEmpPairDetails.getEmployeePair());
+		assertEquals(2, longestEmpPairDetails.getCommonProjects().size());
 	}
 }

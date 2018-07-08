@@ -48,11 +48,11 @@ public final class EmployeePair {
 	@Override
 	public boolean equals(final Object obj) {
 
-		if(obj == null){
-			
+		if (obj == null) {
+
 			return false;
 		}
-		
+
 		if (this == obj) {
 
 			return true;
@@ -65,7 +65,8 @@ public final class EmployeePair {
 
 		final EmployeePair otherPair = (EmployeePair) obj;
 
-		return this.firstEmployee == otherPair.firstEmployee && this.secondEmployee == otherPair.secondEmployee;
+		return (this.firstEmployee == otherPair.firstEmployee && this.secondEmployee == otherPair.secondEmployee)
+				|| (this.firstEmployee == otherPair.secondEmployee && this.secondEmployee == otherPair.firstEmployee);
 	}
 
 	@Override
