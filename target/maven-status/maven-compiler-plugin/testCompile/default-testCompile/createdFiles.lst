@@ -1,7 +1,0 @@
-employees/services/EmployeeServiceIntegrationTest.class
-employees/services/EmployeeServiceUnitTest.class
-employees/services/EmployeeLineParserUnitTest.class
-employees/configuration/ApplicationTestConfig.class
-employees/services/FileServiceIntegrationTest.class
-employees/utils/DateUtilsUnitTest.class
-employees/services/AbstractIntegrationSpringTest.class
