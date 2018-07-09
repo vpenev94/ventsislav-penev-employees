@@ -78,18 +78,19 @@ public class DateUtils {
 
 	/**
 	 * This method calculates the dates between two given dates.
+	 * Includes the start and the end date.
 	 * 
-	 * @param firstDate
-	 *            - first date
-	 * @param secondDate
-	 *            - second date
+	 * @param startDate
+	 *            - starting date
+	 * @param endDate
+	 *            - end date
 	 * @return - number of days between the two given dates.
 	 */
-	public static final long calculateDaysBetweenDates(final LocalDate firstDate, final LocalDate secondDate) {
+	public static final long calculateDaysBetweenDates(final LocalDate startDate, final LocalDate endDate) {
 
-		Objects.requireNonNull(firstDate);
-		Objects.requireNonNull(secondDate);
+		Objects.requireNonNull(startDate);
+		Objects.requireNonNull(endDate);
 
-		return Duration.between(firstDate.atStartOfDay(), secondDate.atStartOfDay()).toDays();
+		return Duration.between(startDate.atStartOfDay(), endDate.atStartOfDay()).toDays() +1 ;
 	}
 }

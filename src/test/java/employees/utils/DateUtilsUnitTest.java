@@ -92,7 +92,7 @@ public class DateUtilsUnitTest {
 		// given
 		final LocalDate startDate = LocalDate.of(2018, 06, 20);
 		final LocalDate endDate = LocalDate.of(2018, 06, 26);
-		final long expectedDays = 6;
+		final long expectedDays = 7;
 
 		// when
 		final long actualDays = DateUtils.calculateDaysBetweenDates(startDate, endDate);

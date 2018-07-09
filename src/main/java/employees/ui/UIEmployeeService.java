@@ -2,8 +2,6 @@ package employees.ui;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,28 +21,19 @@ import employees.services.FileService;
 @Component
 class UIEmployeeService {
 
-	private static final Logger LOGGER = Logger.getLogger(UIEmployeeService.class.getName());
-
 	@Autowired
 	private FileService fileService;
 
 	@Autowired
 	private EmployeeService empService;
 
-	public EmployeePairDetails findLongestEmployeePair(final String pathToFile) throws IOException{
+	public EmployeePairDetails findLongestEmployeePair(final String pathToFile) throws IOException {
 
-		try {
 
 			final List<EmployeeRecord> empRecords = this.fileService.readEmployeeRecords(pathToFile);
 
 			return this.empService.findEmployeePairWorkedLongest(empRecords);
 
-		} catch (IOException ex) {
-
-			LOGGER.log(Level.SEVERE, "Exception when loading employees.", ex.toString()); //$NON-NLS-1$
-			
-			throw ex;
-		}
 	}
 
 }

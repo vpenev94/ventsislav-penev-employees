@@ -9,7 +9,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -21,13 +20,14 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import employees.commons.EmployeePairDetails;
+import employees.exceptions.InvalidDataFormatException;
 
 /**
  * 
  * @author Ventsislav Penev
  * 
- * This class represents the UI main screen.
- * It is also responsible for handling the user interaction.
+ * This class represents the UI main screen. It is also responsible for
+ * handling the user interaction.
  */
 @Component
 class EmployeesScreen extends JFrame {
@@ -115,18 +115,39 @@ class EmployeesScreen extends JFrame {
 
 		this.chooseFileButton.addActionListener(ev -> this.mediator.showFileChooser());
 
+		// This code should be moved into separate thread, because it represents
+		// a long running operation and will block the main Dispatcher thread.
+		// In the context of Swing this can be done by moving this code into
+		// SwingWorker.
 		this.longestEmpPairButton.addActionListener(ev -> {
 
-			final String selectedFile = this.mediator.getSelectedFile();
-			
-			try{
+			if (!this.mediator.hasSelectedFile()) {
+
+				this.mediator.showWarningMessage(this.env.getProperty("screen.noSelectedFile")); //$NON-NLS-1$
+
+				return;
+			}
+
+			if (!this.mediator.isValidSelectedFile()) {
+
+				this.mediator.showWarningMessage(this.env.getProperty("screen.noValidSelectedFile")); //$NON-NLS-1$
+
+				return;
+			}
+
+			try {
+
+				final EmployeePairDetails longestPair = this.uiService.findLongestEmployeePair(this.mediator.getSelectedFile());
 				
-				final EmployeePairDetails longestPair = this.uiService.findLongestEmployeePair(selectedFile);
 				this.mediator.addEmployeePairDetails(longestPair);
-			
-			}catch(@SuppressWarnings("unused") IOException ex){
-				
-				JOptionPane.showMessageDialog(null,this.env.getProperty("screen.erorReadingFromFIle"), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+
+			} catch (@SuppressWarnings("unused") IOException ex) {
+
+				this.mediator.showErrorMessage(this.env.getProperty("screen.erorReadingFromFile")); //$NON-NLS-1$
+
+			} catch (InvalidDataFormatException ex) {
+
+				this.mediator.showErrorMessage(ex.getMessage());
 			}
 		});
 	}

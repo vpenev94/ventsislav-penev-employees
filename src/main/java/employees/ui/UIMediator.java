@@ -64,13 +64,14 @@ class UIMediator {
 		int returnValue = fileChooser.showOpenDialog(null);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
-			
-			if(validateSelectedFile(fileChooser.getSelectedFile().getAbsolutePath())){
-				
+
+			if (validateFile(fileChooser.getSelectedFile().getAbsolutePath())) {
+
 				this.fileNameField.setText(fileChooser.getSelectedFile().getAbsolutePath());
-			}
-			else{
-				JOptionPane.showMessageDialog(null,this.env.getProperty("screen.noValidSelectedFile"), "Error", JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+
+			} else {
+
+				showWarningMessage(this.env.getProperty("screen.noValidSelectedFile")); //$NON-NLS-1$
 			}
 		}
 	}
@@ -79,8 +80,7 @@ class UIMediator {
 
 		if (empPairDetails == null) {
 
-			JOptionPane.showMessageDialog(null, this.env.getProperty("screen.noEmployeePairFound"), "Info", //$NON-NLS-1$ //$NON-NLS-2$
-					JOptionPane.INFORMATION_MESSAGE);
+			showInfoMessage(this.env.getProperty("screen.noEmployeePairFound")); //$NON-NLS-1$
 
 			return;
 		}
@@ -88,11 +88,9 @@ class UIMediator {
 
 			@SuppressWarnings("boxing")
 			final Object[] empTableRowData = new Object[] { empPairDetails.getEmployeePair().getFirstEmployeeId(),
-															empPairDetails.getEmployeePair().getSecondEmployeeId(),
-															projTime.getProjectId(),
-															projTime.getStartDate(),
-															projTime.getEndDate(),
-															DateUtils.calculateDaysBetweenDates(projTime.getStartDate(), projTime.getEndDate()) };
+					empPairDetails.getEmployeePair().getSecondEmployeeId(), projTime.getProjectId(),
+					projTime.getStartDate(), projTime.getEndDate(),
+					DateUtils.calculateDaysBetweenDates(projTime.getStartDate(), projTime.getEndDate()) };
 
 			final DefaultTableModel empTableModel = ((DefaultTableModel) this.employeeTable.getModel());
 			empTableModel.addRow(empTableRowData);
@@ -109,17 +107,48 @@ class UIMediator {
 		this.fileNameField.setText(text);
 	}
 
+	boolean hasSelectedFile() {
+
+		return !this.fileNameField.getText().isEmpty();
+
+	}
+
+	boolean isValidSelectedFile() {
+
+		return validateFile(this.fileNameField.getText());
+
+	}
+
 	String getSelectedFile() {
 
 		return this.fileNameField.getText();
 	}
-	
+
 	@SuppressWarnings("static-method")
-	private boolean validateSelectedFile(final String pathToFile){
-		
-		final File selectedFile = new File(pathToFile);
-		
-		return pathToFile.endsWith(".txt") && selectedFile.exists(); //$NON-NLS-1$
-		
+	void showWarningMessage(final String message) {
+
+		JOptionPane.showMessageDialog(null, message, "Warning", JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
 	}
+
+	@SuppressWarnings("static-method")
+	void showErrorMessage(final String message) {
+
+		JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+	}
+
+	@SuppressWarnings("static-method")
+	void showInfoMessage(final String message) {
+
+		JOptionPane.showMessageDialog(null, message, "Info", JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$
+	}
+
+	@SuppressWarnings("static-method")
+	private boolean validateFile(final String pathToFile) {
+
+		final File selectedFile = new File(pathToFile);
+
+		return pathToFile.endsWith(".txt") && selectedFile.exists(); //$NON-NLS-1$
+
+	}
+
 }

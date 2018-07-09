@@ -54,7 +54,7 @@ public class EmployeeLineParser implements Parser<String, EmployeeRecord> {
 
 		catch (NumberFormatException | DateTimeParseException ex) {
 
-			final String parseExcMsg = "Exception while parsing line: {"+line+"} " + ex.getMessage(); //$NON-NLS-1$ //$NON-NLS-2$
+			final String parseExcMsg = "Error while parsing line: {"+line+"} " + ex.getMessage(); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			LOGGER.log(Level.SEVERE, parseExcMsg);
 			

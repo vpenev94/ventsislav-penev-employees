@@ -1,7 +1,7 @@
 package employees.services;
 
-import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +41,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public final Map<EmployeePair, List<ProjectTime>> findEmployeePairs(final List<EmployeeRecord> empRecords) {
+		
+		Collections.sort(empRecords, (r1,r2) -> r1.getStrartDate().compareTo(r2.getStrartDate()));
 
 		final Map<EmployeePair, List<ProjectTime>> pairProjectTimes = new HashMap<>();
 
@@ -62,7 +64,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 						new Period(firstRecord.getStrartDate(), firstRecord.getEndDate()),
 						new Period(secondRecord.getStrartDate(), secondRecord.getEndDate()));
 
-				if (overlappedPeriod != null) {
+				if (overlappedPeriod == null) {
+					
+					break;
+				}
 
 					final ProjectTime projTime = new ProjectTime(firstRecord.getProjectId(),
 							overlappedPeriod.getStartDate(), overlappedPeriod.getEndDate());
@@ -70,7 +75,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 							secondRecord.getEmployeeId());
 
 					addProjTimeForEmpPair(pairProjectTimes, empPair, projTime);
-				}
 			}
 		}
 		return pairProjectTimes;
@@ -115,6 +119,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	private long calculateWorkedDays(final ProjectTime projTime) {
 
-		return Duration.between(projTime.getStartDate().atStartOfDay(), projTime.getEndDate().atStartOfDay()).toDays();
+		return DateUtils.calculateDaysBetweenDates(projTime.getStartDate(), projTime.getEndDate());
 	}
 }
